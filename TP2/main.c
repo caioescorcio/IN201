@@ -125,7 +125,7 @@ void memfree(void *ptr){
 
 int main() {
     meminit();
-    printf("free list = %p\n", free_list);  // %p 
+    printf("free list = %p\n", free_list);  // %p = endereço absoluto de memória
     void *p1 = memalloc(10000);
     printf("free list = %p\n", free_list);
     void *p2 = memalloc(2000);
