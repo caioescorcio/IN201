@@ -12,43 +12,44 @@
 // #define NTRHEADS 3	// 2 function threads and a main scheduler thread
 #define NTRHEADS 4	// 2 costumers, 1 producer and 1 scheduler
 
+// a print_str function for general use (not to impact the thread system)
 void print_str(char *str) {
 	while (*str) {
 		putchar((int)*str);
     ++str;
-}
+	}	
 }
 
 // print a integer in base 10 using putchar
 void print_int(int x) {
-  if (x < 0) {
-	  putchar('-');
-	  x = -x;
-  }
-  if (x == 0) {
-    putchar('0');
-    return;
-}
-int pos = 1;
-while (x >= pos) {
-	pos *= 10;
-}
-while (pos > 1) {
-	pos /= 10;
-    putchar('0' + (x / pos) % 10);
-}
+  	if (x < 0) {
+	  	putchar('-');
+	  	x = -x;
+  	}
+
+  	if (x == 0) {
+		putchar('0');
+		return;
+	}
+	int pos = 1;
+	while (x >= pos) {
+		pos *= 10;
+	}
+
+	while (pos > 1) {
+		pos /= 10;
+		putchar('0' + (x / pos) % 10);
+	}
 }
 
 
-
-
-typedef void *coroutine_t;
-typedef char mystack_t[STACK_SIZE_FULL];
+typedef void *coroutine_t;	// define the coroutine thread type before the functions for it to be used after
+typedef char mystack_t[STACK_SIZE_FULL];	// thread stack type
 
 // the caracteristics of a thread are: the routine pointer, the stack pointer and the status (metadata)
 typedef struct mythread {
-	coroutine_t routine;
-	mystack_t *stack;
+	coroutine_t routine;	// routine struct
+	mystack_t *stack;		// stack struct
 	bool ready;
 } mythread;
 
@@ -83,10 +84,15 @@ it will begin execution at the address initial_pc. */
 coroutine_t init_coroutine(void *stack_begin, size_t stack_size,
 void (*initial_pc)());
 
+// initializde all the threads in my vector
 void initialize_threads(struct mythread * thread_vector);
+// changes the context of the threads
 void scheduler();
+// changes the context from the current thread back to the scheduler
 void yield();
 
+
+// all my threaded functions
 void foo();
 void bar();
 
@@ -97,6 +103,7 @@ void customer_B();
 int main() { 
 	fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);	// for a non-blocking getchar() function
 
+	// init the routines for each function
 	full = false;
 	prod = init_coroutine(s1, STACK_SIZE_FULL, producer);
 	cA = init_coroutine(s2, STACK_SIZE_FULL, customer_A);	
@@ -104,6 +111,7 @@ int main() {
 
 	scheduler_cr = init_coroutine(s4, STACK_SIZE_FULL, scheduler);
 	
+	// give the function pointers for each thread and define its stacks
 	threads[0].routine = prod;
 	threads[0].stack   = &s1;
 	
@@ -113,7 +121,9 @@ int main() {
 	threads[2].routine = cB;
 	threads[2].stack   = &s3;
 
+	// start the threads
 	initialize_threads(threads);
+	// and enter the scheduler 
 	enter_coroutine(scheduler_cr);
 
 	return 0; 
