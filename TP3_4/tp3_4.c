@@ -193,9 +193,9 @@ void bar(void) {
 
 void producer(void) {
     while (1) {
-        int ch = getchar();
-        if (ch != -1 && ch != EOF) {      // something was typed
-            if (!full) {                  // only write if slot is empty
+		if (!full) {                  // only write if slot is empty
+        	int ch = getchar();
+        	if (ch != -1 && ch != EOF) {      // something was typed
                 letter = (char)ch;
                 full = true;
                 print_str("Producer wrote: ");
@@ -211,9 +211,14 @@ void customer_A(void) {
     while (1) {
         if (full) {
             full = false;
-            print_str("Customer A printing: ");
-			putchar(letter);
-			print_str("\n");
+			int loop_letter = (int) letter;
+			for(int i = 0; i < loop_letter; i++){
+				print_str("Customer A printing: ");
+				printf("%d ", i);
+				putchar((char) loop_letter);
+				print_str("\n");
+				yield();
+			}
         }
 		yield();
     }
@@ -223,9 +228,14 @@ void customer_B(void) {
     while (1) {
         if (full) {
             full = false;
-            print_str("Customer B printing: ");
-			putchar(letter);
-			print_str("\n");
+            int loop_letter = (int) letter;
+			for(int i = 0; i < loop_letter; i++){
+				print_str("Customer B printing: ");
+				printf("%d ", i);
+				putchar((char) loop_letter);
+				print_str("\n");
+				yield();
+			}
         }
 		yield();
     }
